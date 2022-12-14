@@ -18,8 +18,13 @@ import {OutlinedTextField} from 'rn-material-ui-textfield';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import ApiService from '../services/ApiService';
+import Endpoints from '../utils/Endpoints';
+import {useDispatch} from 'react-redux';
+import {login} from '../store/actions/AuthActions';
 
 const Auth = props => {
+  const dispatch = useDispatch();
   var toastRef = React.useRef(null);
   var passcodeRef = React.useRef(null);
   var numberRef = React.useRef(null);
@@ -77,20 +82,48 @@ const Auth = props => {
   const register = async () => {
     if (isSignup) {
       let body = {
-        phone_number: `+92${number}`,
-        passcode: passcode,
+        phoneNumber: `+92${number}`,
+        zipcode: passcode,
         password: password,
       };
+
+      await ApiService.post(Endpoints.user, body, null)
+        .then(res => {
+          let user = res.data.user;
+          let token = res.data.access_token;
+          console.log(token);
+
+          dispatch(login(user, token));
+          Commons.navigate(props.navigation, 'profile_builder');
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
+          Commons.toast(err);
+          setLoading(false);
+        });
     } else {
       let body = {
-        phone_number: `+92${number}`,
+        phoneNumber: `+92${number}`,
         password: password,
       };
-    }
 
-    if (isSignup) Commons.navigate(props.navigation, 'profile_builder');
-    else Commons.reset(props.navigation, 'dashboard');
-    setLoading(false);
+      await ApiService.post(Endpoints.login, body, null)
+        .then(res => {
+          let user = res.data.user;
+          let token = res.data.access_token;
+          console.log(token);
+
+          dispatch(login(user, token));
+          Commons.reset(props.navigation, 'dashboard');
+          setLoading(false);
+        })
+        .catch(err => {
+          console.log(err);
+          Commons.toast(err);
+          setLoading(false);
+        });
+    }
   };
 
   return (
@@ -202,52 +235,46 @@ const Auth = props => {
             />
           )}
 
-          {!isSignup && (
-            <OutlinedTextField
-              containerStyle={{
-                width: '100%',
-                marginTop: RFValue(10),
-              }}
-              secureTextEntry={hidePassword}
-              titleTextStyle={{
-                color: Colors.primary,
-              }}
-              baseColor={Colors.primary}
-              tintColor={Colors.primary}
-              textColor={Colors.primary}
-              labelOffset={{x1: -3 * RFValue(10)}}
-              labelTextStyle={{
-                fontFamily: Fonts.family.bold,
-                paddingHorizontal: RFValue(7),
-              }}
-              labelFontSize={RFValue(16)}
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              maxLength={15}
-              returnKeyType={!isSignup ? 'done' : 'next'}
-              blurOnSubmit={true}
-              ref={ref => {
-                passwordRef = ref;
-              }}
-              renderLeftAccessory={() => (
+          <OutlinedTextField
+            containerStyle={{
+              width: '100%',
+              marginTop: RFValue(10),
+            }}
+            secureTextEntry={hidePassword}
+            titleTextStyle={{
+              color: Colors.primary,
+            }}
+            baseColor={Colors.primary}
+            tintColor={Colors.primary}
+            textColor={Colors.primary}
+            labelOffset={{x1: -3 * RFValue(10)}}
+            labelTextStyle={{
+              fontFamily: Fonts.family.bold,
+              paddingHorizontal: RFValue(7),
+            }}
+            labelFontSize={RFValue(16)}
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            maxLength={15}
+            returnKeyType={!isSignup ? 'done' : 'next'}
+            blurOnSubmit={true}
+            ref={ref => {
+              passwordRef = ref;
+            }}
+            renderLeftAccessory={() => (
+              <IonIcon name={'lock-closed'} size={24} color={Colors.primary} />
+            )}
+            renderRightAccessory={() => (
+              <Pressable onPress={() => setHidePassword(!hidePassword)}>
                 <IonIcon
-                  name={'lock-closed'}
+                  name={hidePassword ? 'eye' : 'eye-off'}
                   size={24}
                   color={Colors.primary}
                 />
-              )}
-              renderRightAccessory={() => (
-                <Pressable onPress={() => setHidePassword(!hidePassword)}>
-                  <IonIcon
-                    name={hidePassword ? 'eye' : 'eye-off'}
-                    size={24}
-                    color={Colors.primary}
-                  />
-                </Pressable>
-              )}
-            />
-          )}
+              </Pressable>
+            )}
+          />
 
           <View
             style={{

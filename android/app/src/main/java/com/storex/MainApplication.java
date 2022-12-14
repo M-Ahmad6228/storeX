@@ -8,7 +8,6 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.reactnativedocumentpicker.DocumentPickerPackage;
 import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.swmansion.reanimated.ReanimatedPackage;

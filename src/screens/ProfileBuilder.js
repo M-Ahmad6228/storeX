@@ -18,14 +18,21 @@ import {OutlinedTextField} from 'rn-material-ui-textfield';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import ApiService from '../services/ApiService';
+import Endpoints from '../utils/Endpoints';
+import {useSelector, useDispatch} from 'react-redux';
 
 const ProfileBuilder = props => {
+  const dispatch = useDispatch();
   var toastRef = React.useRef(null);
   var firstnameRef = React.useRef(null);
   var lastnameRef = React.useRef(null);
   var emailRef = React.useRef(null);
   var numberRef = React.useRef(null);
   var passwordRef = React.useRef(null);
+
+  const {user, token} = useSelector(state => state.authReducer);
+  console.log(token);
 
   const [hidePassword, setHidePassword] = React.useState(true);
   const [firstname, setFirstname] = React.useState('');
@@ -74,28 +81,36 @@ const ProfileBuilder = props => {
       showToast('Please enter valid email address');
       return;
     }
-    if (number.length !== 10) {
-      showToast('Please enter valid phone number');
-      return;
-    }
-    if (password.length < 8 || password.length > 15) {
-      showToast('Password should be with 8-15 characters long');
-      return;
-    }
+    // if (number.length !== 10) {
+    //   showToast('Please enter valid phone number');
+    //   return;
+    // }
+    // if (password.length < 8 || password.length > 15) {
+    //   showToast('Password should be with 8-15 characters long');
+    //   return;
+    // }
 
     setLoading(true);
   };
 
   const register = async () => {
     let body = {
-      first_name: firstname,
-      last_name: lastname,
+      firstName: firstname,
+      lastName: lastname,
       email: email,
-      phone_number: `+92${number}`,
-      password: password,
     };
 
-    Commons.reset(props.navigation, 'dashboard');
+    ApiService.patch(Endpoints.user, body, token, user._id)
+      .then(res => {
+        dispatch(login(res.data.user, res.data.access_token));
+        Commons.reset(props.navigation, 'dashboard');
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        Commons.toast(err);
+        setLoading(false);
+      });
   };
 
   return (
@@ -249,12 +264,12 @@ const ProfileBuilder = props => {
             onChangeText={setEmail}
             maxLength={30}
             autoCapitalize={'none'}
-            returnKeyType={'next'}
+            returnKeyType={'done'}
             keyboardType="email-address"
             blurOnSubmit={false}
-            onSubmitEditing={() => {
-              numberRef.focus();
-            }}
+            // onSubmitEditing={() => {
+            //   numberRef.focus();
+            // }}
             ref={ref => {
               emailRef = ref;
             }}
@@ -263,7 +278,7 @@ const ProfileBuilder = props => {
             )}
           />
 
-          <OutlinedTextField
+          {/* <OutlinedTextField
             containerStyle={{
               width: '100%',
               marginTop: RFValue(10),
@@ -289,21 +304,21 @@ const ProfileBuilder = props => {
             onChangeText={setNumber}
             prefix={'+92'}
             maxLength={10}
-            returnKeyType={'next'}
+            returnKeyType={'done'}
             keyboardType="phone-pad"
             blurOnSubmit={false}
-            onSubmitEditing={() => {
-              passwordRef.focus();
-            }}
+            // onSubmitEditing={() => {
+            //   passwordRef.focus();
+            // }}
             ref={ref => {
               numberRef = ref;
             }}
             renderLeftAccessory={() => (
               <IonIcon name={'call'} size={24} color={Colors.primary} />
             )}
-          />
+          /> */}
 
-          <OutlinedTextField
+          {/* <OutlinedTextField
             containerStyle={{
               width: '100%',
               marginTop: RFValue(10),
@@ -342,7 +357,7 @@ const ProfileBuilder = props => {
                 />
               </Pressable>
             )}
-          />
+          /> */}
 
           <TouchableOpacity
             onPress={validate}

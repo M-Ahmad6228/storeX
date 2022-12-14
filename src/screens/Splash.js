@@ -12,10 +12,19 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import {useSelector} from 'react-redux';
 
 const Splash = props => {
+  const {user} = useSelector(state => state.authReducer);
+
   useEffect(() => {
-    setTimeout(() => {
-      Commons.navigate(props.navigation, 'auth');
-    }, 3000);
+    setTimeout(
+      () => {
+        if (user) {
+          Commons.navigate(props.navigation, 'dashboard');
+        } else {
+          Commons.navigate(props.navigation, 'auth');
+        }
+      },
+      user ? 2000 : 3000,
+    );
   }, []);
 
   return (
