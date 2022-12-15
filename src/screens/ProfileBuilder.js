@@ -21,6 +21,7 @@ import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import ApiService from '../services/ApiService';
 import Endpoints from '../utils/Endpoints';
 import {useSelector, useDispatch} from 'react-redux';
+import {updateUser} from '../store/actions/AuthActions';
 
 const ProfileBuilder = props => {
   const dispatch = useDispatch();
@@ -32,7 +33,6 @@ const ProfileBuilder = props => {
   var passwordRef = React.useRef(null);
 
   const {user, token} = useSelector(state => state.authReducer);
-  console.log(token);
 
   const [hidePassword, setHidePassword] = React.useState(true);
   const [firstname, setFirstname] = React.useState('');
@@ -52,7 +52,7 @@ const ProfileBuilder = props => {
 
   useEffect(() => {
     if (loading) {
-      register();
+      update();
     }
   }, [loading]);
 
@@ -93,7 +93,7 @@ const ProfileBuilder = props => {
     setLoading(true);
   };
 
-  const register = async () => {
+  const update = async () => {
     let body = {
       firstName: firstname,
       lastName: lastname,
@@ -102,7 +102,11 @@ const ProfileBuilder = props => {
 
     ApiService.patch(Endpoints.user, body, token, user._id)
       .then(res => {
-        dispatch(login(res.data.user, res.data.access_token));
+        user.firstName = firstname;
+        user.lastName = lastname;
+        user.email = email;
+
+        dispatch(updateUser(user));
         Commons.reset(props.navigation, 'dashboard');
         setLoading(false);
       })
@@ -266,7 +270,7 @@ const ProfileBuilder = props => {
             autoCapitalize={'none'}
             returnKeyType={'done'}
             keyboardType="email-address"
-            blurOnSubmit={false}
+            blurOnSubmit={true}
             // onSubmitEditing={() => {
             //   numberRef.focus();
             // }}

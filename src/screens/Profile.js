@@ -3,6 +3,7 @@ import {
   Text,
   SafeAreaView,
   ScrollView,
+  ActivityIndicator,
   Pressable,
   StatusBar,
   Image,
@@ -14,8 +15,69 @@ import {Commons, Fonts, Colors, Images} from '../utils';
 import HorizontalTappable from '../components/HorizontalTappable';
 import {RFValue} from 'react-native-responsive-fontsize';
 import CardView from 'react-native-cardview';
+import {useDispatch, useSelector} from 'react-redux';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {updateUser} from '../store/actions/AuthActions';
+import ApiService from '../services/ApiService';
+import Endpoints from '../utils/Endpoints';
 
 const Profile = props => {
+  const dispatch = useDispatch();
+  const {user, token} = useSelector(state => state.authReducer);
+  const [loading, setLoading] = React.useState(false);
+  const [avatar, setAvatar] = React.useState(
+    user && user.image ? user.image : '',
+  );
+
+  const pickImages = async () => {
+    await launchImageLibrary({
+      mediaType: 'photo',
+    })
+      .then(async res => {
+        await Commons.cropFile(res.assets[0].uri)
+          .then(async result => {
+            setLoading(true);
+            setAvatar(result.path);
+            let filename =
+              result.modificationDate +
+              result.path.substring(result.path.lastIndexOf('.'));
+
+            await Commons.uploadToFirebase(result.path, filename).then(
+              async snapshot => {
+                if (snapshot.state === 'success') {
+                  const url = await Commons.getUrl(filename);
+                  console.log(url);
+                  user.image = url;
+                  ApiService.patch(
+                    Endpoints.user,
+                    {
+                      image: url,
+                    },
+                    token,
+                    user._id,
+                  )
+                    .then(ans => {
+                      dispatch(updateUser(user));
+                      setLoading(false);
+                    })
+                    .catch(err => {
+                      setLoading(false);
+                    });
+                }
+              },
+            );
+          })
+          .catch(err => {
+            console.log(err);
+            setLoading(false);
+          });
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
@@ -76,7 +138,7 @@ const Profile = props => {
                 width: RFValue(120),
                 resizeMode: 'cover',
               }}
-              source={Images.avatar}
+              source={avatar !== '' ? {uri: avatar} : Images.avatar}
             />
           </View>
         </CardView>
@@ -92,8 +154,27 @@ const Profile = props => {
             bottom: -1 * RFValue(20),
             backgroundColor: Colors.primary,
           }}>
-          <Icon name="image" size={22} color={Colors.white} />
+          <Icon
+            name="image"
+            size={22}
+            color={Colors.white}
+            onPress={pickImages}
+          />
         </CardView>
+        {loading && (
+          <View
+            style={{
+              height: RFValue(120),
+              width: RFValue(120),
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'absolute',
+              left: 0,
+              top: RFValue(15),
+            }}>
+            <ActivityIndicator size={50} color={Colors.primary} />
+          </View>
+        )}
       </View>
 
       <Text
@@ -104,7 +185,7 @@ const Profile = props => {
           marginTop: RFValue(25),
           alignSelf: 'center',
         }}>
-        Hi user
+        {user ? `${user.firstName} ${user.lastName}` : ''}
       </Text>
       <Text
         style={{
@@ -113,7 +194,7 @@ const Profile = props => {
           fontSize: RFValue(15),
           alignSelf: 'center',
         }}>
-        Hi user
+        {user ? user.email : ''}
       </Text>
 
       <CardView

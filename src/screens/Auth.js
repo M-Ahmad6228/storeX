@@ -91,7 +91,6 @@ const Auth = props => {
         .then(res => {
           let user = res.data.user;
           let token = res.data.access_token;
-          console.log(token);
 
           dispatch(login(user, token));
           Commons.navigate(props.navigation, 'profile_builder');
@@ -112,10 +111,10 @@ const Auth = props => {
         .then(res => {
           let user = res.data.user;
           let token = res.data.access_token;
-          console.log(token);
-
           dispatch(login(user, token));
-          Commons.reset(props.navigation, 'dashboard');
+
+          if (user.email) Commons.reset(props.navigation, 'dashboard');
+          else Commons.reset(props.navigation, 'profile_builder');
           setLoading(false);
         })
         .catch(err => {
@@ -215,15 +214,18 @@ const Auth = props => {
                 paddingHorizontal: RFValue(7),
               }}
               labelFontSize={RFValue(16)}
-              label="Passcode"
+              label="Postal Code"
               value={passcode}
               onChangeText={setPasscode}
               maxLength={20}
-              returnKeyType={'done'}
+              returnKeyType={'next'}
               keyboardType="phone-pad"
-              blurOnSubmit={true}
+              blurOnSubmit={false}
               ref={ref => {
                 passcodeRef = ref;
+              }}
+              onSubmitEditing={() => {
+                passwordRef.focus();
               }}
               renderLeftAccessory={() => (
                 <MaterialIcon
@@ -257,7 +259,7 @@ const Auth = props => {
             value={password}
             onChangeText={setPassword}
             maxLength={15}
-            returnKeyType={!isSignup ? 'done' : 'next'}
+            returnKeyType={'done'}
             blurOnSubmit={true}
             ref={ref => {
               passwordRef = ref;

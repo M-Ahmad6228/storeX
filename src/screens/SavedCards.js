@@ -5,22 +5,37 @@ import {
   View,
   StatusBar,
   SafeAreaView,
+  Image,
   ScrollView,
   BackHandler,
   Pressable,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {Styles, Globals, Fonts, Colors, Commons} from '../utils';
+import {Styles, Globals, Fonts, Colors, Commons, Images} from '../utils';
 import Toast, {DURATION} from 'react-native-easy-toast';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {OutlinedTextField} from 'rn-material-ui-textfield';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import {useDispatch} from 'react-redux';
+import CardModal from '../components/CardModal';
 
 const SavedCards = props => {
   var toastRef = React.useRef(null);
+
+  const [addCardModal, setCardModal] = useState(false);
+  const [cardHolder, setCardHolder] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [cardType, setCardType] = useState('');
+  const [type, setType] = useState('');
+  const [isEnabled, setEnabled] = useState(false);
+  const [isEdit, setEdit] = useState(false);
+  const [selectedId, setSelectedId] = useState('');
+  const [visible, setVisible] = useState(false);
 
   const [loading, setLoading] = React.useState(false);
 
@@ -75,7 +90,64 @@ const SavedCards = props => {
         <IonIcon name="notifications" size={22} color={Colors.primary} />
       </View>
 
-      <View style={{paddingHorizontal: RFValue(15)}}></View>
+      <View style={{padding: RFValue(15)}}>
+        <TouchableOpacity
+          style={{
+            borderRadius: Commons.size(10),
+            flexDirection: 'row',
+            backgroundColor: Colors.primary,
+            padding: Commons.size(15),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            setCardModal(true);
+          }}>
+          <Text
+            style={{
+              fontFamily: Fonts.family.bold,
+              flex: 1,
+              color: Colors.white,
+              fontSize: Commons.size(14),
+            }}>
+            Add new card
+          </Text>
+          <IonIcon
+            name={'chevron-forward'}
+            size={Commons.size(25)}
+            color={Colors.white}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <CardModal
+        objects={{
+          addCardModal,
+          cardHolder,
+          cardNumber,
+          expiry,
+          cvv,
+          cardType,
+          type,
+          isEnabled,
+          isEdit,
+          selectedId,
+          visible,
+        }}
+        setters={{
+          setCardModal,
+          setCardHolder,
+          setCardNumber,
+          setExpiry,
+          setCvv,
+          setCardType,
+          setType,
+          setEnabled,
+          setEdit,
+          setSelectedId,
+          setVisible,
+        }}
+      />
 
       <Toast
         ref={ref => {

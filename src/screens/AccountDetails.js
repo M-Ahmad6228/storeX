@@ -18,18 +18,28 @@ import {OutlinedTextField} from 'rn-material-ui-textfield';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import AwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import {useDispatch, useSelector} from 'react-redux';
 
 const AccountDetails = props => {
+  const dispatch = useDispatch();
+  const {user, token} = useSelector(state => state.authReducer);
+
   var toastRef = React.useRef(null);
   var firstNameRef = React.useRef(null);
   var lastNameRef = React.useRef(null);
   var numberRef = React.useRef(null);
   var emailRef = React.useRef(null);
 
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
-  const [number, setNumber] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  const [firstName, setFirstName] = React.useState(
+    user && user.firstName ? user.firstName : '',
+  );
+  const [lastName, setLastName] = React.useState(
+    user && user.lastName ? user.lastName : '',
+  );
+  const [number, setNumber] = React.useState(user ? user.phoneNumber : '');
+  const [email, setEmail] = React.useState(
+    user && user.email ? user.email : '',
+  );
 
   const [loading, setLoading] = React.useState(false);
 
@@ -39,6 +49,12 @@ const AccountDetails = props => {
     return () =>
       BackHandler.removeEventListener('hardwareBackPress', backAction);
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      update();
+    }
+  }, [loading]);
 
   const backAction = () => {
     props.navigation.goBack();
@@ -52,12 +68,52 @@ const AccountDetails = props => {
   };
 
   const validate = () => {
-    if (number.length !== 10) {
-      showToast('Please enter valid phone number');
+    if (firstname.trim().length < 3) {
+      showToast('Please enter valid firstname');
+      return;
+    }
+    if (lastname.trim().length < 3) {
+      showToast('Please enter valid lastname');
       return;
     }
 
+    if (email.trim().length === 0) {
+      showToast('Please enter valid email address');
+      return;
+    }
+    // if (number.length !== 10) {
+    //   showToast('Please enter valid phone number');
+    //   return;
+    // }
+    // if (password.length < 8 || password.length > 15) {
+    //   showToast('Password should be with 8-15 characters long');
+    //   return;
+    // }
+
     setLoading(true);
+  };
+
+  const update = async () => {
+    let body = {
+      firstName: firstname,
+      lastName: lastname,
+      email: email,
+    };
+
+    ApiService.patch(Endpoints.user, body, token, user._id)
+      .then(res => {
+        user.firstName = firstname;
+        user.lastName = lastname;
+        user.email = email;
+
+        dispatch(updateUser(user));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        Commons.toast(err);
+        setLoading(false);
+      });
   };
 
   return (
@@ -182,9 +238,10 @@ const AccountDetails = props => {
           }}
           label="Phone Number"
           value={number}
+          disabled={true}
           onChangeText={setNumber}
           // prefix={'+92'}
-          maxLength={10}
+          // maxLength={10}
           returnKeyType={'next'}
           keyboardType="phone-pad"
           blurOnSubmit={false}

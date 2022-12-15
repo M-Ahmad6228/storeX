@@ -18,7 +18,8 @@ const Splash = props => {
     setTimeout(
       () => {
         if (user) {
-          Commons.navigate(props.navigation, 'dashboard');
+          if (user.email) Commons.reset(props.navigation, 'dashboard');
+          else Commons.reset(props.navigation, 'profile_builder');
         } else {
           Commons.navigate(props.navigation, 'auth');
         }

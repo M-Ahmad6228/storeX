@@ -13,8 +13,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Commons, Fonts, Colors, Images} from '../utils';
 import {RFValue} from 'react-native-responsive-fontsize';
 import CardView from 'react-native-cardview';
+import {useSelector} from 'react-redux';
 
 const Dashboard = props => {
+  const {user} = useSelector(state => state.authReducer);
+
   const Item = ({item}) => {
     return (
       <CardView
@@ -179,7 +182,7 @@ const Dashboard = props => {
                 marginTop: RFValue(10),
                 alignSelf: 'center',
               }}>
-              Hi user
+              Hi {user.firstName}
             </Text>
 
             <CardView

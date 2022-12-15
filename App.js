@@ -5,6 +5,7 @@ import {LogBox} from 'react-native';
 import {Provider} from 'react-redux';
 import {store, persistor} from './src/store/Store';
 import {PersistGate} from 'redux-persist/integration/react';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const App = props => {
   return (

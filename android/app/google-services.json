@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "552227109137",
+    "project_id": "storex-371612",
+    "storage_bucket": "storex-371612.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552227109137:android:f71373f8a29dfb8857b4b0",
+        "android_client_info": {
+          "package_name": "com.storex"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552227109137-fgd0i9blkpmbbjt426p5go17m18jpsnt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMpf_9rH_LIsv9noA2Wu-qOVVHA2vLWv4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552227109137-fgd0i9blkpmbbjt426p5go17m18jpsnt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

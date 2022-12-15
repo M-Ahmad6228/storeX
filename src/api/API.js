@@ -15,14 +15,14 @@ export const api = (method, endpoint, body, headers) => {
       },
     })
       .then(res => {
-        if (res.data.status) resolve(res);
+        if (res.data.success) resolve(res);
         else {
           Commons.toast(res.data.message);
           reject(res);
         }
       })
       .catch(err => {
-        console.log(err.response.data);
+        // console.log(err.response.data);
         Commons.toast(err.message);
         reject(err);
       });
