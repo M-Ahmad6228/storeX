@@ -10,7 +10,8 @@ import {
   Auth,
   ProfileBuilder,
   Dashboard,
-  Products,
+  Category,
+  Product,
   Orders,
   Settings,
   Support,
@@ -46,11 +47,11 @@ export default function StackNavigation() {
           }}
         />
         <Drawer.Screen
-          name="products"
-          component={Products}
+          name="categroies"
+          component={Category}
           options={{
             headerShown: false,
-            drawerLabel: 'Products',
+            drawerLabel: 'Categories',
             drawerIcon: ({color, size}) => {
               return <Ionicons name="cart" color={color} size={20} />;
             },
@@ -132,6 +133,13 @@ export default function StackNavigation() {
       <Stack.Screen
         name="dashboard"
         component={Drawers}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="products"
+        component={Product}
         options={{
           headerShown: false,
         }}

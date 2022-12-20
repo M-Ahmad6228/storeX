@@ -12,29 +12,25 @@ import {
 import React, {useEffect, useState} from 'react';
 import {Commons, Fonts, Colors, Images} from '../utils';
 import ApiService from '../services/ApiService';
-import Products from '../components/Products';
+import Categories from '../components/Categories';
 import Endpoints from '../utils/Endpoints';
 import {useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-export default function Product(props) {
+export default function Category(props) {
   const {token} = useSelector(state => state.authReducer);
-  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchProducts();
+    fetchCategories();
   }, []);
 
-  const fetchProducts = () => {
+  const fetchCategories = () => {
     setRefreshing(true);
-    ApiService.get(
-      Endpoints.products,
-      token,
-      '?category=' + props.route.params.id,
-    )
+    ApiService.get(Endpoints.categories, token)
       .then(res => {
-        setProducts(res.data.products);
+        setCategories(res.data.categories);
         setRefreshing(false);
       })
       .catch(err => {
@@ -62,9 +58,9 @@ export default function Product(props) {
         }}>
         <Pressable
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.openDrawer();
           }}>
-          <Icon name="chevron-back" size={22} color={Colors.white} />
+          <Icon name="menu" size={22} color={Colors.white} />
         </Pressable>
         <Text
           style={{
@@ -74,7 +70,7 @@ export default function Product(props) {
             color: Colors.white,
             fontFamily: Fonts.family.bold,
           }}>
-          Products
+          Categories
         </Text>
         <Icon name="notifications" size={22} color={Colors.primary} />
       </View>
@@ -106,10 +102,11 @@ export default function Product(props) {
       </View>
 
       <View style={{flex: 1, paddingHorizontal: Commons.width(0.05)}}>
-        <Products
-          products={products}
+        <Categories
+          navigation={props.navigation}
+          categories={categories}
           refreshing={refreshing}
-          fetchProducts={fetchProducts}
+          fetchCategories={fetchCategories}
         />
       </View>
     </SafeAreaView>
