@@ -29,6 +29,7 @@ export default function StackNavigation() {
     const Drawer = createDrawerNavigator();
     return (
       <Drawer.Navigator
+        detachInactiveScreens={true}
         drawerContent={props => <CustomDrawer {...props} />}
         screenOptions={{
           headerShown: false,
@@ -108,7 +109,7 @@ export default function StackNavigation() {
   };
 
   return (
-    <Stack.Navigator initialRouteName={'splash'}>
+    <Stack.Navigator initialRouteName={'splash'} detachInactiveScreens={true}>
       <Stack.Screen
         name="splash"
         component={Splash}
