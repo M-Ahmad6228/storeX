@@ -7,16 +7,27 @@ import {
   StatusBar,
   Image,
   FlatList,
+  RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {Commons, Fonts, Colors, Images} from '../utils';
+import {Commons, Fonts, Colors, Images, Endpoints} from '../utils';
 import {RFValue} from 'react-native-responsive-fontsize';
 import CardView from 'react-native-cardview';
 import {useSelector} from 'react-redux';
+import ApiService from '../services/ApiService';
+import Slider from '../components/Slider';
 
 const Dashboard = props => {
-  const {user} = useSelector(state => state.authReducer);
+  const {user, token} = useSelector(state => state.authReducer);
+  const [ads, setAds] = useState([]);
+  const [cart, setCart] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    refresh();
+  }, []);
 
   const Item = ({item}) => {
     return (
@@ -129,161 +140,194 @@ const Dashboard = props => {
     },
   ];
 
+  const fetchAds = async () => {
+    setRefreshing(true);
+    await ApiService.get(Endpoints.ads, token)
+      .then(res => {
+        setAds(res.data.advertisements);
+        fetchCart();
+      })
+      .catch(err => {
+        setRefreshing(false);
+      });
+  };
+
+  const fetchCart = async () => {
+    await ApiService.get(Endpoints.cart, token)
+      .then(res => {
+        setCart(res.data.cart);
+        setRefreshing(false);
+      })
+      .catch(err => {
+        setRefreshing(false);
+      });
+  };
+
+  const refresh = () => {
+    fetchAds();
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: Colors.primary,
-          padding: RFValue(15),
-        }}>
-        <Pressable
-          onPress={() => {
-            props.navigation.openDrawer();
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+        }>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: Colors.primary,
+            padding: RFValue(15),
           }}>
-          <Icon name="menu" size={22} color={Colors.white} />
-        </Pressable>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.openDrawer();
+            }}>
+            <Icon name="menu" size={Commons.size(25)} color={Colors.white} />
+          </TouchableOpacity>
+          <Icon name="cart" size={Commons.size(25)} color={Colors.primary} />
+          <Text
+            style={{
+              flex: 1,
+              textAlign: 'center',
+              fontSize: RFValue(18),
+              color: Colors.white,
+              fontFamily: Fonts.family.bold,
+            }}>
+            Store X
+          </Text>
+          <TouchableOpacity
+            style={{marginRight: Commons.size(10)}}
+            onPress={() => {}}>
+            <Icon name="cart" size={Commons.size(25)} color={Colors.white} />
+            {cart && cart.items.length > 0 && (
+              <View
+                style={{
+                  backgroundColor: 'red',
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  height: Commons.size(10),
+                  width: Commons.size(10),
+                  borderRadius: Commons.size(5),
+                }}
+              />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
+            <Icon
+              name="notifications"
+              size={Commons.size(25)}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {ads.length > 0 && (
+          <View>
+            <Slider
+              data={ads}
+              slider={true}
+              duration={4000}
+              navigation={props.navigation}
+            />
+          </View>
+        )}
+
         <Text
           style={{
-            flex: 1,
-            textAlign: 'center',
-            fontSize: RFValue(18),
-            color: Colors.white,
+            color: 'black',
             fontFamily: Fonts.family.bold,
+            fontSize: RFValue(22),
+            marginTop: RFValue(10),
+            alignSelf: 'center',
           }}>
-          Store X
+          Hi {user ? user.firstName : ''}
         </Text>
-        <Icon name="notifications" size={22} color={Colors.white} />
-      </View>
 
-      <FlatList
-        overScrollMode={'never'}
-        style={{
-          paddingBottom: RFValue(15),
-          alignSelf: 'center',
-        }}
-        nestedScrollEnabled
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        numColumns={3}
-        data={data}
-        renderItem={({item}) => <Item item={item} />}
-        keyExtractor={item => item.id}
-        ListHeaderComponent={
-          <ScrollView contentContainerStyle={{paddingHorizontal: RFValue(5)}}>
+        <CardView
+          cornerRadius={RFValue(10)}
+          cardElevation={RFValue(3)}
+          cardMaxElevation={RFValue(3)}
+          style={{
+            width: Commons.width(0.9),
+            alignSelf: 'center',
+            padding: RFValue(10),
+            backgroundColor: Colors.white,
+            marginVertical: RFValue(10),
+          }}>
+          <View>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text
+                style={{
+                  flex: 1,
+                  color: 'black',
+                  fontSize: RFValue(18),
+                  fontFamily: Fonts.family.bold,
+                }}>
+                Your next delivery
+              </Text>
+              <Icon
+                name={'chevron-forward-circle-sharp'}
+                size={35}
+                color={Colors.primary}
+              />
+            </View>
             <Text
               style={{
                 color: 'black',
-                fontFamily: Fonts.family.bold,
-                fontSize: RFValue(22),
-                marginTop: RFValue(10),
-                alignSelf: 'center',
+                fontSize: RFValue(14),
+                fontFamily: Fonts.family.regular,
               }}>
-              Hi {user.firstName}
+              Start your next order
             </Text>
 
-            <CardView
-              cornerRadius={RFValue(10)}
-              cardElevation={RFValue(3)}
-              cardMaxElevation={RFValue(3)}
+            <TouchableOpacity
+              onPress={() => {
+                Commons.navigate(props.navigation, 'categories');
+              }}
               style={{
                 padding: RFValue(10),
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.primary,
+                height: RFValue(100),
+                width: RFValue(100),
+                alignItems: 'center',
+                justifyContent: 'center',
                 marginVertical: RFValue(10),
               }}>
-              <View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      flex: 1,
-                      color: 'black',
-                      fontSize: RFValue(18),
-                      fontFamily: Fonts.family.bold,
-                    }}>
-                    Your next delivery
-                  </Text>
-                  <Icon
-                    name={'chevron-forward-circle-sharp'}
-                    size={35}
-                    color={Colors.primary}
-                  />
-                </View>
-                <Text
-                  style={{
-                    color: 'black',
-                    fontSize: RFValue(14),
-                    fontFamily: Fonts.family.regular,
-                  }}>
-                  Start your next order
-                </Text>
+              <Icon name={'add'} color={Colors.white} size={Commons.size(25)} />
 
-                <View
-                  style={{
-                    padding: RFValue(10),
-                    backgroundColor: Colors.primary,
-                    height: RFValue(100),
-                    width: RFValue(100),
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginVertical: RFValue(10),
-                  }}>
-                  <Icon name={'add'} color={Colors.white} size={22} />
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.family.regular,
+                }}>
+                Add products
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </CardView>
 
-                  <Text
-                    style={{
-                      color: Colors.white,
-                      fontSize: RFValue(14),
-                      fontFamily: Fonts.family.regular,
-                    }}>
-                    Add more products
-                  </Text>
-                </View>
-              </View>
-            </CardView>
-
-            <CardView
-              cornerRadius={RFValue(10)}
-              cardElevation={RFValue(3)}
-              cardMaxElevation={RFValue(3)}
-              style={{
-                padding: RFValue(10),
-                backgroundColor: Colors.white,
-                marginVertical: RFValue(10),
-              }}>
-              <View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      flex: 1,
-                      color: 'black',
-                      fontSize: RFValue(18),
-                      fontFamily: Fonts.family.bold,
-                    }}>
-                    Refer a friend
-                  </Text>
-                  <Icon
-                    name={'chevron-forward-circle-sharp'}
-                    size={35}
-                    color={Colors.primary}
-                  />
-                </View>
-                <Text
-                  style={{
-                    color: 'black',
-                    fontSize: RFValue(14),
-                    fontFamily: Fonts.family.regular,
-                  }}>
-                  Receive free goodies on your doorstep
-                </Text>
-              </View>
-            </CardView>
-          </ScrollView>
-        }
-        ListFooterComponent={<View style={{height: RFValue(10)}}></View>}
-      />
+        <FlatList
+          overScrollMode={'never'}
+          style={{
+            paddingBottom: RFValue(15),
+            alignSelf: 'center',
+          }}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          numColumns={3}
+          data={data}
+          renderItem={({item}) => <Item item={item} />}
+          keyExtractor={item => item.id}
+          ListFooterComponent={<View style={{height: RFValue(10)}}></View>}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };

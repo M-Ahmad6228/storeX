@@ -2,7 +2,7 @@ import axios from 'react-native-axios';
 // import {BASE_URL} from 'react-native-dotenv';
 import Commons from '../utils/Commons';
 
-const BASE_URL = 'https://storex-371612.uc.r.appspot.com/';
+const BASE_URL = 'https://storex-371612.uc.r.appspot.com/api/';
 
 export const api = (method, endpoint, body, headers) => {
   return new Promise((resolve, reject) => {
@@ -18,7 +18,7 @@ export const api = (method, endpoint, body, headers) => {
         if (res.data.success) resolve(res);
         else {
           Commons.toast(res.data.message);
-          reject(res);
+          reject(res.data.message);
         }
       })
       .catch(err => {

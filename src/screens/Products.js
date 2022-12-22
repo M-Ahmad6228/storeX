@@ -110,6 +110,7 @@ export default function Product(props) {
           products={products}
           refreshing={refreshing}
           fetchProducts={fetchProducts}
+          navigation={props.navigation}
         />
       </View>
     </SafeAreaView>

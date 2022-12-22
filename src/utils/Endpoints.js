@@ -1,7 +1,12 @@
 export default {
-  user: '/api/users/',
-  login: '/api/users/login',
+  user: 'users/',
+  login: 'users/login',
 
-  categories: '/api/categories/',
-  products: '/api/products/',
+  categories: 'categories/',
+  products: 'products/',
+  ads: 'advertisements/',
+  cart: 'cart/',
+  addToCart: 'cart/add',
+  increment: 'cart/increment',
+  decrement: 'cart/decrement',
 };

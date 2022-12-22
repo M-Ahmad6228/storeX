@@ -71,7 +71,7 @@ const Auth = props => {
       showToast('Please enter valid postcode');
       return;
     }
-    if ((password.length < 8 || password.length > 15) && !isSignup) {
+    if ((password.length < 6 || password.length > 15) && !isSignup) {
       showToast('Password should be with 8-15 characters long');
       return;
     }

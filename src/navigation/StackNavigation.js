@@ -20,6 +20,7 @@ import {
   DeliveryDetails,
   SavedCards,
   MarketingPreferences,
+  ProductDetail,
 } from '../screens';
 
 export default function StackNavigation() {
@@ -29,7 +30,7 @@ export default function StackNavigation() {
     const Drawer = createDrawerNavigator();
     return (
       <Drawer.Navigator
-        detachInactiveScreens={true}
+        // detachInactiveScreens={false}
         drawerContent={props => <CustomDrawer {...props} />}
         screenOptions={{
           headerShown: false,
@@ -48,7 +49,7 @@ export default function StackNavigation() {
           }}
         />
         <Drawer.Screen
-          name="categroies"
+          name="categories"
           component={Category}
           options={{
             headerShown: false,
@@ -109,7 +110,7 @@ export default function StackNavigation() {
   };
 
   return (
-    <Stack.Navigator initialRouteName={'splash'} detachInactiveScreens={true}>
+    <Stack.Navigator initialRouteName={'splash'} detachInactiveScreens={false}>
       <Stack.Screen
         name="splash"
         component={Splash}
@@ -169,6 +170,13 @@ export default function StackNavigation() {
       <Stack.Screen
         name="marketing_preferences"
         component={MarketingPreferences}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="product_detail"
+        component={ProductDetail}
         options={{
           headerShown: false,
         }}
