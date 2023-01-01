@@ -13,3 +13,4 @@ export {default as DeliveryDetails} from './DeliveryDetails';
 export {default as SavedCards} from './SavedCards';
 export {default as MarketingPreferences} from './MarketingPreferences';
 export {default as ProductDetail} from './ProductDetail';
+export {default as Cart} from './Cart';

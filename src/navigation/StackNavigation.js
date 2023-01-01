@@ -21,6 +21,7 @@ import {
   SavedCards,
   MarketingPreferences,
   ProductDetail,
+  Cart,
 } from '../screens';
 
 export default function StackNavigation() {
@@ -177,6 +178,13 @@ export default function StackNavigation() {
       <Stack.Screen
         name="product_detail"
         component={ProductDetail}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="cart"
+        component={Cart}
         options={{
           headerShown: false,
         }}

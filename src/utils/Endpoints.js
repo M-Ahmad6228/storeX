@@ -9,4 +9,6 @@ export default {
   addToCart: 'cart/add',
   increment: 'cart/increment',
   decrement: 'cart/decrement',
+
+  order: 'orders/',
 };

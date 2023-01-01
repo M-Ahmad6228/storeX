@@ -18,16 +18,18 @@ import CardView from 'react-native-cardview';
 import {useSelector} from 'react-redux';
 import ApiService from '../services/ApiService';
 import Slider from '../components/Slider';
+import {useIsFocused} from '@react-navigation/native';
 
 const Dashboard = props => {
+  const isFocused = useIsFocused();
   const {user, token} = useSelector(state => state.authReducer);
   const [ads, setAds] = useState([]);
   const [cart, setCart] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    refresh();
-  }, []);
+    if (isFocused) refresh();
+  }, [isFocused]);
 
   const Item = ({item}) => {
     return (
@@ -201,7 +203,15 @@ const Dashboard = props => {
           </Text>
           <TouchableOpacity
             style={{marginRight: Commons.size(10)}}
-            onPress={() => {}}>
+            onPress={() => {
+              if (cart && cart.items.length > 0) {
+                Commons.navigate(props.navigation, 'cart', {
+                  cart: cart,
+                });
+              } else {
+                Commons.toast('No items added to cart');
+              }
+            }}>
             <Icon name="cart" size={Commons.size(25)} color={Colors.white} />
             {cart && cart.items.length > 0 && (
               <View
